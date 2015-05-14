@@ -331,7 +331,7 @@ public class Solution implements Serializable {
 //        if(i==1){
 //            continue;
 //        }
-        aux = aux + this.getObjective(i)+" ";
+        aux = aux + (-1*this.getObjective(i))+"\t";
 
     }
     return aux;

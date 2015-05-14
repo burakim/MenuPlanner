@@ -72,7 +72,7 @@ public class Main
             //problem = new Kursawe("BinaryReal", 3);
            // problem = new Water("Real");
 
-            problem = new Knapsack("Binary", 9,2,1);
+            problem = new Knapsack("Binary", 3059,2,25);
             //problem = new ConstrEx("Real");
             //problem = new DTLZ1("Real");
             //problem = new OKA2("Real") ;
@@ -83,13 +83,15 @@ public class Main
         algorithm = new NSGAII(problem);
 
         // Algorithm parameters
+//        algorithm.setInputParameter("populationSize",100);
+//        algorithm.setInputParameter("maxEvaluations",1000000);
         algorithm.setInputParameter("populationSize",100);
-        algorithm.setInputParameter("maxEvaluations",25000);
+        algorithm.setInputParameter("maxEvaluations",10000);
        // algorithm.setInputParameter("archiveSize",10);
 
         // Mutation and Crossover for Real codification
         parameters = new HashMap() ;
-        parameters.put("probability", 0.9) ;
+        parameters.put("probability", 1.0) ;
         parameters.put("distributionIndex", 20.0) ;
         crossover = CrossoverFactory.getCrossoverOperator("SinglePointCrossover", parameters);
 

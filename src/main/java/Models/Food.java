@@ -20,6 +20,7 @@ public class Food implements Comparable<Food>{
     private double protein;
     private double lipid;
     private double ash;
+    private double cost;
 
     @Override
     public String toString() {
@@ -44,6 +45,10 @@ public class Food implements Comparable<Food>{
         return 0;
     }
 
+    public Food()
+    {
+
+    }
     private double carbonhydrt;
     private double fiber;  // turkish mean lif
     private double sugar;
@@ -51,6 +56,7 @@ public class Food implements Comparable<Food>{
     private double iron;
     private double magnesium;
     private double phosphorus;
+    private double rate;
     private double potassium;
     private double sodium;
     private double zinc;
@@ -881,5 +887,21 @@ public class Food implements Comparable<Food>{
 
     public void setFoodName(String foodName) {
         this.foodName = foodName;
+    }
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
     }
 }

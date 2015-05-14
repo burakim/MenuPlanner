@@ -21,7 +21,9 @@
 
 package jmetal.core;
 
+import Models.Food;
 import jmetal.util.Configuration;
+import menuplanner.Knapsack;
 
 import java.io.*;
 import java.util.*;
@@ -239,12 +241,54 @@ public class SolutionSet implements Serializable {
       BufferedWriter bw      = new BufferedWriter(osw)        ;
 
       for (Solution aSolutionsList_ : solutionsList_) {
+
         //if (this.vector[i].getFitness()<1.0) {
         bw.write(aSolutionsList_.toString());
         bw.newLine();
+          ArrayList<Food> selectedFoods = new ArrayList<Food>();
+        int a=0;
+        for(Variable var: aSolutionsList_.getDecisionVariables()) {
+            a++;
+            if (var.toString().compareTo("1") == 0) {
+               // bw.write(Knapsack.databank.get(a).getFoodName());
+                //bw.newLine();
+                selectedFoods.add(Knapsack.databank.get(a));
+
+            }
+        }
+          double carbonhydrate=0.0, fiber=0.0, protein=0.0, water=0.0, vitaminC=0.0, vitaminD=0.0, vitaminE=0.0, vitaminK=0.0, thiamin=0.0, riboflavin=0.0, vitaminB6=0.0,folateTot=0.0,vitaminB12=0.0,PantoAcid=0.0,CholineTot=0.0,calcium=0.0,copper=0.0,iron=0.0;
+          for(int i=0;i<selectedFoods.size();i++)
+          {
+              carbonhydrate += selectedFoods.get(i).getCarbonhydrt();
+              fiber += selectedFoods.get(i).getFiber();
+              protein += selectedFoods.get(i).getProtein();
+              water += selectedFoods.get(i).getWater();
+              vitaminC += selectedFoods.get(i).getVitaminC();
+              vitaminD +=selectedFoods.get(i).getVitaminD();
+              vitaminE += selectedFoods.get(i).getVitaminE();
+              vitaminK += selectedFoods.get(i).getVitaminK();
+              thiamin += selectedFoods.get(i).getThiamin();
+              riboflavin += selectedFoods.get(i).getRiboflavin();
+              vitaminB6 += selectedFoods.get(i).getVitaminB6();
+              folateTot += selectedFoods.get(i).getFolateTot();
+              vitaminB12 += selectedFoods.get(i).getVitaminB12();
+              PantoAcid += selectedFoods.get(i).getPantoAcid();
+              CholineTot += selectedFoods.get(i).getCholineTot();
+              calcium += selectedFoods.get(i).getCalcium();
+              copper += selectedFoods.get(i).getCopper();
+              iron += selectedFoods.get(i).getIron();
+          }
+
+          String result = "Result carbonhydrate = "+carbonhydrate +" fiber= "+fiber+" protein= "+protein+" water= "+water+" vitaminC= "+vitaminC+ " vitaminD= "+ vitaminD
+                  +" vitaminE= "+vitaminE+ " vitaminK= "+vitaminK + " thiamin= "+thiamin+ " riboflavin= "+riboflavin+" vitaminB6= "+vitaminB6+" folateTot= "+folateTot+" vitaminB12= "+
+                  vitaminB12+" pantoAcid= "+PantoAcid+" cholineTot= "+CholineTot+ " calcium= "+calcium+ " copper= "+copper+ " iron= "+iron;
+          bw.newLine();
+
+          bw.write(result);
+
         //}
       }
-
+;
       /* Close the file */
       bw.close();
     }catch (IOException e) {
@@ -293,14 +337,14 @@ public class SolutionSet implements Serializable {
       for (Solution aSolutionsList_ : solutionsList_) {
         if (aSolutionsList_.getOverallConstraintViolation() == 0.0) {
             String str="";
-            for(int i=0; i<aSolutionsList_.getDecisionVariables().length;i++) {
-                if(i == aSolutionsList_.getDecisionVariables().length-1)
-                str += aSolutionsList_.getDecisionVariables()[i].toString() + " - "  ;
-                else
-                    str += aSolutionsList_.getDecisionVariables()[i].toString();
-            }
-          bw.write(aSolutionsList_.toString() +" - " + str);
-          //  bw.write(aSolutionsList_.toString());
+//            for(int i=0; i<aSolutionsList_.getDecisionVariables().length;i++) {
+//                if(i == aSolutionsList_.getDecisionVariables().length-1)
+//                str += aSolutionsList_.getDecisionVariables()[i].toString() + " - "  ;
+//                else
+//                    str += aSolutionsList_.getDecisionVariables()[i].toString();
+//            }
+//          bw.write(aSolutionsList_.toString() +" - " + str);
+            bw.write(aSolutionsList_.toString());
           bw.newLine();
         }
       }

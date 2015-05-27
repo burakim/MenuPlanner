@@ -5,6 +5,8 @@ import jmetal.core.Operator;
 import jmetal.core.Problem;
 import jmetal.core.SolutionSet;
 import jmetal.metaheuristics.nsgaII.NSGAII;
+import jmetal.metaheuristics.nsgaII.pNSGAII;
+import jmetal.metaheuristics.spea2.SPEA2;
 import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.mutation.MutationFactory;
 import jmetal.operators.selection.SelectionFactory;
@@ -12,6 +14,8 @@ import jmetal.problems.ProblemFactory;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
+import jmetal.util.parallel.IParallelEvaluator;
+import jmetal.util.parallel.MultithreadedEvaluator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,16 +62,16 @@ public class Main
         logger_.addHandler(fileHandler_) ;
 
         indicators = null ;
-        if (args.length == 1) {
-            Object [] params = {"Real"};
-            problem = (new ProblemFactory()).getProblem(args[0],params);
-        } // if
-        else if (args.length == 2) {
-            Object [] params = {"Real"};
-            problem = (new ProblemFactory()).getProblem(args[0],params);
-            indicators = new QualityIndicator(problem, args[1]) ;
-        } // if
-        else { // Default problem
+//        if (args.length == 1) {
+////            Object [] params = {"Real"};
+////            problem = (new ProblemFactory()).getProblem(args[0],params);
+//        } // if
+//        else if (args.length == 2) {
+////            Object [] params = {"Real"};
+////            problem = (new ProblemFactory()).getProblem(args[0],params);
+////            indicators = new QualityIndicator(problem, args[1]) ;
+//        } // if
+        // Default problem
             //problem = new Kursawe("Real", 3);
             //problem = new Kursawe("BinaryReal", 3);
            // problem = new Water("Real");
@@ -76,18 +80,24 @@ public class Main
             //problem = new ConstrEx("Real");
             //problem = new DTLZ1("Real");
             //problem = new OKA2("Real") ;
-        } // else
+         // else
 
         //algorithm = new NSGAII(problem);
-      //  algorithm = new SPEA2(problem);
-        algorithm = new NSGAII(problem);
+//        algorithm = new SPEA2(problem);
+     //   algorithm = new NSGAII(problem);
+        IParallelEvaluator parallelEvaluator = new MultithreadedEvaluator(0);
+        algorithm = new pNSGAII(problem,parallelEvaluator);
 
         // Algorithm parameters
 //        algorithm.setInputParameter("populationSize",100);
 //        algorithm.setInputParameter("maxEvaluations",1000000);
-        algorithm.setInputParameter("populationSize",100);
-        algorithm.setInputParameter("maxEvaluations",10000);
-       // algorithm.setInputParameter("archiveSize",10);
+
+
+
+        algorithm.setInputParameter("populationSize",Integer.parseInt(args[0]));
+        algorithm.setInputParameter("maxEvaluations",Integer.parseInt(args[1]));
+//        algorithm.setInputParameter("maxEvaluations",1000);
+//        algorithm.setInputParameter("archiveSize",100);
 
         // Mutation and Crossover for Real codification
         parameters = new HashMap() ;
@@ -118,11 +128,17 @@ public class Main
         long estimatedTime = System.currentTimeMillis() - initTime;
 
         // Result messages
-        logger_.info("Total execution time: "+estimatedTime + "ms");
+        logger_.info("Total execution time: " + estimatedTime + "ms");
         logger_.info("Variables values have been writen to file VAR");
         population.printVariablesToFile("VAR");
         logger_.info("Objectives values have been writen to file FUN");
         population.printObjectivesToFile("FUN");
+        population.printFoodLists();
+        if (estimatedTime < Integer.MIN_VALUE || estimatedTime > Integer.MAX_VALUE) {
+            population.sendResultWithEmail(-1);
+        }
+        else
+        population.sendResultWithEmail((int)estimatedTime);
 
         if (indicators != null) {
             logger_.info("Quality indicators") ;

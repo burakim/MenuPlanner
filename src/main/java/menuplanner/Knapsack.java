@@ -6,6 +6,8 @@ import jmetal.core.Problem;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -147,57 +149,69 @@ if(cost <0)
         for (int var = 0; var < this.numberOfVariables_; var++) {
             if(variables[var].toString().compareTo("1") == 0) {
 
-               constraints[0] = constraints[0] +  databank.get(var).getCarbonhydrt();
-                constraints[1] = constraints[1] + databank.get(var).getFiber();
-                constraints[2] = constraints[2] + databank.get(var).getProtein();
-                constraints[3] = constraints[3] + databank.get(var).getWater();
+               constraints[0] = constraints[0] +  databank.get(var).getCalcium();
+                constraints[1] = constraints[1] + databank.get(var).getProtein();
+                constraints[2] = constraints[2] + databank.get(var).getCarbonhydrt();
+                constraints[3] = constraints[3] + databank.get(var).getVitaminA_IU();
                 constraints[4] = constraints[4] + databank.get(var).getVitaminC();
                 constraints[5] = constraints[5] + databank.get(var).getVitaminD();
                 constraints[6] = constraints[6] + databank.get(var).getVitaminE();
-                constraints[7] = constraints[7] + databank.get(var).getVitaminK();
-                constraints[8] = constraints[8] + databank.get(var).getThiamin();
-                constraints[9] = constraints[9] + databank.get(var).getRiboflavin();
+                constraints[7] = constraints[7] + databank.get(var).getThiamin();
+                constraints[8] = constraints[8] + databank.get(var).getRiboflavin();
+                constraints[9] = constraints[9] + databank.get(var).getNiacin();
                 constraints[10] = constraints[10] + databank.get(var).getVitaminB6();
-                constraints[11] = constraints[11]  + databank.get(var).getFolateTot();
-                constraints[12] = constraints[12] + databank.get(var).getVitaminB12();
-                constraints[13] = constraints[13] + databank.get(var).getPantoAcid();
-                constraints[14] = constraints[14] + databank.get(var).getCholineTot();
-                constraints[15] = constraints[15] + databank.get(var).getCalcium();
-                constraints[16] = constraints[16] + databank.get(var).getCopper();
-                constraints[17] = constraints[17] + databank.get(var).getIron();
-                constraints[18] = constraints[18] + databank.get(var).getMagnesium();
-                constraints[19] = constraints [19] + databank.get(var).getPhosphorus();
-                constraints[21] = constraints [20] + databank.get(var).getPotassium();
-                constraints[22] = constraints [22] + databank.get(var).getSelenium();
-                constraints[23] = constraints [23] + databank.get(var).getSodium();
-                constraints[24] = constraints [24] + databank.get(var).getZinc();
+//                constraints[11] = constraints[11]  + databank.get(var).getFolateTot();
+                constraints[11] = constraints[11] + databank.get(var).getVitaminB12();
+                constraints[12] = constraints[12] + databank.get(var).getCopper();
+//                constraints[14] = constraints[14] + databank.get(var).get(); Iodine
+                constraints[13] = constraints[13] + databank.get(var).getIron();
+                constraints[14] = constraints[14] + databank.get(var).getMagnesium();
+//                constraints[17] = constraints[17] + databank.get(var).getM(); Molybdenum
+                constraints[15] = constraints[15] + databank.get(var).getPhosphorus();
+                constraints[16] = constraints [16] + databank.get(var).getSelenium();
+                constraints[17] = constraints [17] + databank.get(var).getZinc();
+
             }
         }
-             double[] maxVal  = {443,38,53,-2,-2,-1,2000,100,1000,-1,-1,-1,35,100,1000,-1-1,3500};
-        double[] recommendVal = {307,38,53,-2,-2,3.7,90,15,15,120,1.2,1.3,16,1.3,400,2.4,5,550};
+             double[] maxVal  = {2500,650 ,120 ,3000 ,2000 ,100 ,1000 ,-2 ,-2    ,35  ,100   ,-2 ,10     ,45 ,350  ,4000 ,400 ,40};
+        double[] recommendVal = {800 ,100 ,43  ,625  ,75   ,10  ,12   ,1  ,101   ,12  ,1.1   ,2  ,0.7    ,6  ,330  ,580  ,45  ,9.4};
         double[] constraintViolation = new double[18];
-
+        double tolarance = 0.15;
         for(int j=0;j<maxVal.length;j++)
         {
+if(maxVal[j] ==-2)
+{
+    if(constraints[j] < (recommendVal[j] - tolarance * recommendVal[j]))
+    {
+        constraintViolation[j] = constraints[j] - recommendVal[j];
+    }
+}
+else{
+            if (constraints[j] >= (recommendVal[j] - tolarance * recommendVal[j]) && (constraints[j] <= maxVal[j] + tolarance * recommendVal[j])) {
+                constraintViolation[j] = 0;
 
+            } else if (constraints[j] > recommendVal[j]) {
+                constraintViolation[j] = recommendVal[j] - constraints[j];
+            } else {
+                constraintViolation[j] = constraints[j] - recommendVal[j];
 
-               if (constraints[j] >= recommendVal[j] && constraints[j] <= maxVal[j]) {
-                   constraintViolation[j] = 0;
-
-               } else if( constraints[j] > recommendVal[j]){
-                   constraintViolation[j] =  recommendVal[j] -  constraints[j];
-               }
-            else{
-                   constraintViolation[j] = constraints[j] - recommendVal[j] ;
-
-               }
+            }
+        }
         }
 
         for (int i = 0; i < maxVal.length; i++) {
 
             if (constraintViolation[i] < 0.0) {
-                // This is exceeding constraint problem.
-                number++;
+                double ratio;
+                if(maxVal[i]!=-2)
+                ratio = constraintViolation[i] / ((recommendVal[i]+maxVal[i])/2);
+                else
+                ratio = constraintViolation[i] / ((recommendVal[i]));
+                BigDecimal bd = new BigDecimal(ratio);
+                bd = bd.setScale(0, RoundingMode.HALF_UP);
+                number = number + (-1*bd.intValue())+1;
+;                // This is exceeding constraint problem.
+                number = number ;
                 total +=constraintViolation[i];
             }
 
@@ -205,8 +219,8 @@ if(cost <0)
 
         }
          solution.setOverallConstraintViolation(total);
-        if(number<13)
-            System.out.println("13 ten kucuk var");
+//        if(number<13)
+//            System.out.println("13 ten kucuk var");
         solution.setNumberOfViolatedConstraint(number);
 
     }

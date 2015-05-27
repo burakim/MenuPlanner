@@ -18,5 +18,9 @@
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: de.erichseifert.gral:gral-core:0.10" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: de.erichseifert.vectorgraphics2d:VectorGraphics2D:0.9.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.mail:mail:1.5.0-b01" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
   </component>
 </module>

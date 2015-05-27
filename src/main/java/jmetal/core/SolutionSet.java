@@ -23,7 +23,9 @@ package jmetal.core;
 
 import Models.Food;
 import jmetal.util.Configuration;
+import menuplanner.EmailManager;
 import menuplanner.Knapsack;
+import menuplanner.OutputManager;
 
 import java.io.*;
 import java.util.*;
@@ -41,7 +43,8 @@ public class SolutionSet implements Serializable {
   /** 
    * Maximum size of the solution set 
    */
-  private int capacity_ = 0; 
+  private int capacity_ = 0;
+    private OutputManager outputManager;
 
   /**
    * Constructor.
@@ -58,6 +61,9 @@ public class SolutionSet implements Serializable {
   public SolutionSet(int maximumSize){    
     solutionsList_ = new ArrayList<Solution>();
     capacity_      = maximumSize;
+
+
+
   } // SolutionSet
 
   /** 
@@ -228,63 +234,79 @@ public class SolutionSet implements Serializable {
     return solutionsList_.size();
   } // size
 
+   public void printFoodLists()
+   {
+       if(outputManager == null)
+       outputManager = new OutputManager(solutionsList_);
+       outputManager.printFoodLists();
+   }
+
   /** 
    * Writes the objective function values of the <code>Solution</code> 
    * objects into the set in a file.
    * @param path The output file name
    */
+
   public void printObjectivesToFile(String path){
     try {
       /* Open the file */
       FileOutputStream fos   = new FileOutputStream(path)     ;
       OutputStreamWriter osw = new OutputStreamWriter(fos)    ;
       BufferedWriter bw      = new BufferedWriter(osw)        ;
+      if(outputManager!=null)
+        outputManager.print2ObjectiveValues();
+        else {
+//          System.out.println("Output Manager is null,  graph creation ignored");
+          outputManager = new OutputManager(solutionsList_);
+          outputManager.print2ObjectiveValues();
 
+      }
       for (Solution aSolutionsList_ : solutionsList_) {
 
         //if (this.vector[i].getFitness()<1.0) {
-        bw.write(aSolutionsList_.toString());
+          bw.write(aSolutionsList_.toString());
         bw.newLine();
-          ArrayList<Food> selectedFoods = new ArrayList<Food>();
-        int a=0;
-        for(Variable var: aSolutionsList_.getDecisionVariables()) {
-            a++;
-            if (var.toString().compareTo("1") == 0) {
-               // bw.write(Knapsack.databank.get(a).getFoodName());
-                //bw.newLine();
-                selectedFoods.add(Knapsack.databank.get(a));
 
-            }
-        }
-          double carbonhydrate=0.0, fiber=0.0, protein=0.0, water=0.0, vitaminC=0.0, vitaminD=0.0, vitaminE=0.0, vitaminK=0.0, thiamin=0.0, riboflavin=0.0, vitaminB6=0.0,folateTot=0.0,vitaminB12=0.0,PantoAcid=0.0,CholineTot=0.0,calcium=0.0,copper=0.0,iron=0.0;
-          for(int i=0;i<selectedFoods.size();i++)
-          {
-              carbonhydrate += selectedFoods.get(i).getCarbonhydrt();
-              fiber += selectedFoods.get(i).getFiber();
-              protein += selectedFoods.get(i).getProtein();
-              water += selectedFoods.get(i).getWater();
-              vitaminC += selectedFoods.get(i).getVitaminC();
-              vitaminD +=selectedFoods.get(i).getVitaminD();
-              vitaminE += selectedFoods.get(i).getVitaminE();
-              vitaminK += selectedFoods.get(i).getVitaminK();
-              thiamin += selectedFoods.get(i).getThiamin();
-              riboflavin += selectedFoods.get(i).getRiboflavin();
-              vitaminB6 += selectedFoods.get(i).getVitaminB6();
-              folateTot += selectedFoods.get(i).getFolateTot();
-              vitaminB12 += selectedFoods.get(i).getVitaminB12();
-              PantoAcid += selectedFoods.get(i).getPantoAcid();
-              CholineTot += selectedFoods.get(i).getCholineTot();
-              calcium += selectedFoods.get(i).getCalcium();
-              copper += selectedFoods.get(i).getCopper();
-              iron += selectedFoods.get(i).getIron();
-          }
-
-          String result = "Result carbonhydrate = "+carbonhydrate +" fiber= "+fiber+" protein= "+protein+" water= "+water+" vitaminC= "+vitaminC+ " vitaminD= "+ vitaminD
-                  +" vitaminE= "+vitaminE+ " vitaminK= "+vitaminK + " thiamin= "+thiamin+ " riboflavin= "+riboflavin+" vitaminB6= "+vitaminB6+" folateTot= "+folateTot+" vitaminB12= "+
-                  vitaminB12+" pantoAcid= "+PantoAcid+" cholineTot= "+CholineTot+ " calcium= "+calcium+ " copper= "+copper+ " iron= "+iron;
-          bw.newLine();
-
-          bw.write(result);
+//          ArrayList<Food> selectedFoods = new ArrayList<Food>();
+//        int a=0;
+//        for(Variable var: aSolutionsList_.getDecisionVariables()) {
+//            a++;
+//            if (var.toString().compareTo("1") == 0) {
+//               // bw.write(Knapsack.databank.get(a).getFoodName());
+//                //bw.newLine();
+//                selectedFoods.add(Knapsack.databank.get(a));
+//
+//            }
+//        }
+//          double carbonhydrate=0.0, fiber=0.0, protein=0.0, water=0.0, vitaminC=0.0, vitaminD=0.0, vitaminE=0.0, vitaminK=0.0, thiamin=0.0, riboflavin=0.0, vitaminB6=0.0,folateTot=0.0,vitaminB12=0.0,PantoAcid=0.0,CholineTot=0.0,calcium=0.0,copper=0.0,iron=0.0;
+//          for(int i=0;i<selectedFoods.size();i++)
+//          {
+//              carbonhydrate += selectedFoods.get(i).getCarbonhydrt();
+//              fiber += selectedFoods.get(i).getFiber();
+//              protein += selectedFoods.get(i).getProtein();
+//              water += selectedFoods.get(i).getWater();
+//              vitaminC += selectedFoods.get(i).getVitaminC();
+//              vitaminD +=selectedFoods.get(i).getVitaminD();
+//              vitaminE += selectedFoods.get(i).getVitaminE();
+//              vitaminK += selectedFoods.get(i).getVitaminK();
+//              thiamin += selectedFoods.get(i).getThiamin();
+//              riboflavin += selectedFoods.get(i).getRiboflavin();
+//              vitaminB6 += selectedFoods.get(i).getVitaminB6();
+//              folateTot += selectedFoods.get(i).getFolateTot();
+//              vitaminB12 += selectedFoods.get(i).getVitaminB12();
+//              PantoAcid += selectedFoods.get(i).getPantoAcid();
+//              CholineTot += selectedFoods.get(i).getCholineTot();
+//              calcium += selectedFoods.get(i).getCalcium();
+//              copper += selectedFoods.get(i).getCopper();
+//              iron += selectedFoods.get(i).getIron();
+//          }
+//
+//          String result = "Result carbonhydrate = "+carbonhydrate +" fiber= "+fiber+" protein= "+protein+" water= "+water+" vitaminC= "+vitaminC+ " vitaminD= "+ vitaminD
+//                  +" vitaminE= "+vitaminE+ " vitaminK= "+vitaminK + " thiamin= "+thiamin+ " riboflavin= "+riboflavin+" vitaminB6= "+vitaminB6+" folateTot= "+folateTot+" vitaminB12= "+
+//                  vitaminB12+" pantoAcid= "+PantoAcid+" cholineTot= "+CholineTot+ " calcium= "+calcium+ " copper= "+copper+ " iron= "+iron;
+//          bw.newLine();
+//
+//          bw.write(result);
 
         //}
       }
@@ -477,5 +499,19 @@ public class SolutionSet implements Serializable {
   public int getCapacity() {
     return capacity_ ;
   }
+
+
+    public boolean sendResultWithEmail(int executionTime )
+    {
+        if(outputManager != null) {
+            EmailManager emailManager = new EmailManager();
+            emailManager.sendResults("h.burakyesilyurt@gmail.com",outputManager.getExecutionNumber(),executionTime,outputManager.archiveResults());
+return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 } // SolutionSet
 

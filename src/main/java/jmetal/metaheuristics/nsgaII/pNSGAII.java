@@ -191,7 +191,7 @@ public class pNSGAII extends Algorithm {
           requiredEvaluations = evaluations;
         } // if
       } // if
-      
+      System.out.println("Current Evolution Number ="+evaluations);
     } // while
 
     parallelEvaluator_.stopEvaluator();

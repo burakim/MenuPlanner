@@ -71,25 +71,25 @@ public class FilterOperations {
 
 
     }
-    public void maintaindataStore()
-    {
-        String[] keyArray =  dataStore.keySet().toArray(new String[dataStore.size()]);
-        for(int i =0; i<keyArray.length;i++)
-        {
-            // if(keyArray[i].equals("CHEESE") ) {
-            ArrayList<Food> tempList =secondNameOptimization(dataStore.get(keyArray[i]));
-            dataStore.remove(keyArray[i]);
-            dataStore.put(keyArray[i],tempList );
-            /// }
-            // standardDeviation((ArrayList<Food>)dataStore.get(keyArray[i]));
-        }
-        int count = 0;
-        for(int i =0; i<keyArray.length;i++)
-        {
-            count += dataStore.get(keyArray[i]).size();
-        }
-        System.out.println("Total db size "+count);
-    }
+//    public void maintaindataStore()
+//    {
+//        String[] keyArray =  dataStore.keySet().toArray(new String[dataStore.size()]);
+//        for(int i =0; i<keyArray.length;i++)
+//        {
+//            // if(keyArray[i].equals("CHEESE") ) {
+////            ArrayList<Food> tempList =secondNameOptimization(dataStore.get(keyArray[i]));
+//            dataStore.remove(keyArray[i]);
+//            dataStore.put(keyArray[i],tempList );
+//            /// }
+//            // standardDeviation((ArrayList<Food>)dataStore.get(keyArray[i]));
+//        }
+//        int count = 0;
+//        for(int i =0; i<keyArray.length;i++)
+//        {
+//            count += dataStore.get(keyArray[i]).size();
+//        }
+//        System.out.println("Total db size "+count);
+//    }
     class  FoodSize
     {
         private int size;
@@ -106,78 +106,78 @@ public class FilterOperations {
         }
     }
 
-    public ArrayList<Food> secondNameOptimization(ArrayList<Food> secondFielddata)
-    {
-        HashMap<String, ArrayList<Food>> mapDataStore = new HashMap<String, ArrayList<Food>>();
-        HashMap<String, FoodSize> mapDataStoreDivide = new HashMap<String, FoodSize>();
-        ArrayList<Food> returnedVal = new ArrayList<Food>();
-        for(int i=0; i<secondFielddata.size();i++) {
-            String[] tempArray = secondFielddata.get(i).getFoodName().split(",");
-            if (tempArray.length > 1) {
-                if (mapDataStore.containsKey(tempArray[1])) {
-                    int size = mapDataStoreDivide.get(tempArray[1]).getSize();
-
-                    mapDataStore.get(tempArray[1]).get(0).multiplyThemAll(size);
-                    mapDataStoreDivide.get(tempArray[1]).increment();
-                    size = mapDataStoreDivide.get(tempArray[1]).getSize();
-                    mapDataStore.get(tempArray[1]).get(0).AddAverage(secondFielddata.get(i));
-                    mapDataStore.get(tempArray[1]).get(0).divideThemAll(size);
-
-//                mapDataStore.get(tempArray[1]).add(secondFielddata.get(i));
+//    public ArrayList<Food> secondNameOptimization(ArrayList<Food> secondFielddata)
+//    {
+//        HashMap<String, ArrayList<Food>> mapDataStore = new HashMap<String, ArrayList<Food>>();
+//        HashMap<String, FoodSize> mapDataStoreDivide = new HashMap<String, FoodSize>();
+//        ArrayList<Food> returnedVal = new ArrayList<Food>();
+//        for(int i=0; i<secondFielddata.size();i++) {
+//            String[] tempArray = secondFielddata.get(i).getFoodName().split(",");
+//            if (tempArray.length > 1) {
+//                if (mapDataStore.containsKey(tempArray[1])) {
+//                    int size = mapDataStoreDivide.get(tempArray[1]).getSize();
 //
-//                mapDataStore.get(tempArray[1]).get(mapDataStore.get(tempArray[1]).size()-1).setFoodName(tempArray[0]+","+tempArray[1]);
-//                mapDataStore.get(tempArray[1]).get(0).getAverage(secondFielddata.get(i),mapDataStore.get(tempArray[1]).size());
-//                mapDataStore.get(tempArray[1]).get(0).setFoodName(tempArray[0]+","+tempArray[1]);
-
-
-                    //  mapDataStore.get(tempArray[0]).add(secondFielddata.get(i));
-                } else {
-                    FoodSize foodSize = new FoodSize();
-                    foodSize.increment();
-                    ArrayList<Food> temp = new ArrayList<Food>();
-                    temp.add(secondFielddata.get(i));
-                    mapDataStore.put(tempArray[1], temp);
-                    mapDataStoreDivide.put(tempArray[1], foodSize);
-                }
-
-            }
-        }
-        String[] keys = mapDataStore.keySet().toArray(new String[mapDataStore.keySet().size()]);
-
-
-        for(int i=0;i<keys.length;i++)
-        {
-            for(int j=0; j<mapDataStore.get(keys[i]).size();j++)
-            {
-                returnedVal.add(mapDataStore.get(keys[i]).get(j));
-            }
-        }
-
-//        String[] keyArray =  dataStore.keySet().toArray(new String[dataStore.size()]);
-//        for(int i =0; i<keyArray.length;i++)
-//        {
-//            if(keyArray[i].equals("CHEESE") )
-//                standardDeviation((ArrayList<Food>)dataStore.get(keyArray[i]));
+//                    mapDataStore.get(tempArray[1]).get(0).multiplyThemAll(size);
+//                    mapDataStoreDivide.get(tempArray[1]).increment();
+//                    size = mapDataStoreDivide.get(tempArray[1]).getSize();
+//                    mapDataStore.get(tempArray[1]).get(0).AddAverage(secondFielddata.get(i));
+//                    mapDataStore.get(tempArray[1]).get(0).divideThemAll(size);
+//
+////                mapDataStore.get(tempArray[1]).add(secondFielddata.get(i));
+////
+////                mapDataStore.get(tempArray[1]).get(mapDataStore.get(tempArray[1]).size()-1).setFoodName(tempArray[0]+","+tempArray[1]);
+////                mapDataStore.get(tempArray[1]).get(0).getAverage(secondFielddata.get(i),mapDataStore.get(tempArray[1]).size());
+////                mapDataStore.get(tempArray[1]).get(0).setFoodName(tempArray[0]+","+tempArray[1]);
+//
+//
+//                    //  mapDataStore.get(tempArray[0]).add(secondFielddata.get(i));
+//                } else {
+//                    FoodSize foodSize = new FoodSize();
+//                    foodSize.increment();
+//                    ArrayList<Food> temp = new ArrayList<Food>();
+//                    temp.add(secondFielddata.get(i));
+//                    mapDataStore.put(tempArray[1], temp);
+//                    mapDataStoreDivide.put(tempArray[1], foodSize);
+//                }
+//
+//            }
 //        }
-        return returnedVal;
-    }
-    public ArrayList<Food> standardDeviation(ArrayList<Food> data)
-    {
-        // Standard deviation hesaplanacak.
-        int amount = data.size();
-        String tempStr =  data.get(0).getFoodName();
-        String[] array = tempStr.split(",");
-
-        double sum=0;
-        for (int i=0;i <data.size();i++)
-        {
-            sum += data.get(i).getEnergy();
-        }
-
-        System.out.println(array[0] + " - "+  sum/amount);
-        return null;
-
-    }
+//        String[] keys = mapDataStore.keySet().toArray(new String[mapDataStore.keySet().size()]);
+//
+//
+//        for(int i=0;i<keys.length;i++)
+//        {
+//            for(int j=0; j<mapDataStore.get(keys[i]).size();j++)
+//            {
+//                returnedVal.add(mapDataStore.get(keys[i]).get(j));
+//            }
+//        }
+//
+////        String[] keyArray =  dataStore.keySet().toArray(new String[dataStore.size()]);
+////        for(int i =0; i<keyArray.length;i++)
+////        {
+////            if(keyArray[i].equals("CHEESE") )
+////                standardDeviation((ArrayList<Food>)dataStore.get(keyArray[i]));
+////        }
+//        return returnedVal;
+//    }
+//    public ArrayList<Food> standardDeviation(ArrayList<Food> data)
+//    {
+//        // Standard deviation hesaplanacak.
+//        int amount = data.size();
+//        String tempStr =  data.get(0).getFoodName();
+//        String[] array = tempStr.split(",");
+//
+//        double sum=0;
+//        for (int i=0;i <data.size();i++)
+//        {
+//            sum += data.get(i).getEnergy();
+//        }
+//
+//        System.out.println(array[0] + " - "+  sum/amount);
+//        return null;
+//
+//    }
     public void printFoods()
     {
         Iterator<Food> iterator = dataStore.get("CHEESE").iterator();

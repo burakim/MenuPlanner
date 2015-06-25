@@ -109,7 +109,7 @@ public class SPEA2 extends Algorithm{
         offSpringSolutionSet.add(offSpring[0]);
         evaluations++;
       } // while
-      // End Create a offSpring solutionSet
+      // End Create a offSpring solutionSetba
       solutionSet = offSpringSolutionSet;                   
     } // while
         

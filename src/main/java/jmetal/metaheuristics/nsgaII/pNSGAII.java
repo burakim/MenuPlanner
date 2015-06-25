@@ -27,8 +27,11 @@ import jmetal.util.JMException;
 import jmetal.util.Ranking;
 import jmetal.util.comparators.CrowdingComparator;
 import jmetal.util.parallel.IParallelEvaluator;
+import menuplanner.Knapsack;
+import menuplanner.RepairConstraint;
 
 import java.util.List;
+import java.util.Random;
 
 /** 
  *  Implementation of NSGA-II.
@@ -42,7 +45,8 @@ import java.util.List;
 
 public class pNSGAII extends Algorithm {
 
-  IParallelEvaluator parallelEvaluator_ ; 
+  IParallelEvaluator parallelEvaluator_ ;
+  private RepairConstraint repairConstraint;
 
   /**
    * Constructor
@@ -51,7 +55,7 @@ public class pNSGAII extends Algorithm {
    */
   public pNSGAII(Problem problem, IParallelEvaluator evaluator) {
     super (problem) ;
-
+repairConstraint = new RepairConstraint();
     parallelEvaluator_ = evaluator ;
   } // pNSGAII
 
@@ -67,6 +71,7 @@ public class pNSGAII extends Algorithm {
     int evaluations;
     int numberOfThreads ;
 
+
     QualityIndicator indicators; // QualityIndicator object
     int requiredEvaluations; // Use in the example of use of the
     // indicators object (see below)
@@ -78,12 +83,15 @@ public class pNSGAII extends Algorithm {
     Operator mutationOperator;
     Operator crossoverOperator;
     Operator selectionOperator;
+//    RepairConstraint repairConstraint;
 
     Distance distance = new Distance();
 
     //Read the parameters
     populationSize = ((Integer) getInputParameter("populationSize")).intValue();
     maxEvaluations = ((Integer) getInputParameter("maxEvaluations")).intValue();
+
+//    repairConstraint = new RepairConstraint();
     indicators = (QualityIndicator) getInputParameter("indicators");
 
     parallelEvaluator_.startEvaluator(problem_) ;
@@ -114,7 +122,10 @@ public class pNSGAII extends Algorithm {
 
     // Generations 
     while (evaluations < maxEvaluations) {
-      // Create the offSpring solutionSet      
+      Random  random = new Random();
+
+      int chance = random.nextInt(101);;
+      // Create the offSpring solutionSet
       offspringPopulation = new SolutionSet(populationSize);
       Solution[] parents = new Solution[2];
       for (int i = 0; i < (populationSize / 2); i++) {
@@ -139,9 +150,23 @@ public class pNSGAII extends Algorithm {
 
       // Create the solutionSet union of solutionSet and offSpring
       union = ((SolutionSet) population).union(offspringPopulation);
-
+     // repairConstraint.repair(union);
       // Ranking the union
       Ranking ranking = new Ranking(union);
+//if(chance <10 && chance>0) {
+//  System.out.println("Lets repair them");
+//  if (ranking.getSubfront(0).size() > 0) {
+//    Solution solution = repairConstraint.repair(ranking.getSubfront(0).get(0));
+//    ranking.getSubfront(0).remove(0);
+//
+//    ranking.getSubfront(0).add(0, solution);
+//  }
+//  if (ranking.getSubfront(0).size() > 1) {
+//    Solution solution = repairConstraint.repair(ranking.getSubfront(0).get(1));
+//    ranking.getSubfront(0).remove(1);
+//    ranking.getSubfront(0).add(1, solution);
+//  }
+//}
 
       int remain = populationSize;
       int index = 0;

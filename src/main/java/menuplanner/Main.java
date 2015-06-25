@@ -6,6 +6,7 @@ import jmetal.core.Problem;
 import jmetal.core.SolutionSet;
 import jmetal.metaheuristics.nsgaII.NSGAII;
 import jmetal.metaheuristics.nsgaII.pNSGAII;
+import jmetal.metaheuristics.spea2.SPAE2Parallel;
 import jmetal.metaheuristics.spea2.SPEA2;
 import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.mutation.MutationFactory;
@@ -76,7 +77,11 @@ public class Main
             //problem = new Kursawe("BinaryReal", 3);
            // problem = new Water("Real");
 
-            problem = new Knapsack("Binary", 3059,2,25);
+        //            problem = new Knapsack("Binary", 3059,2,25);
+
+
+        problem = new Knapsack("Binary", 3060,2,25,0.25);
+//        Knapsack knapsack = (Knapsack)problem;
             //problem = new ConstrEx("Real");
             //problem = new DTLZ1("Real");
             //problem = new OKA2("Real") ;
@@ -85,23 +90,26 @@ public class Main
         //algorithm = new NSGAII(problem);
 //        algorithm = new SPEA2(problem);
      //   algorithm = new NSGAII(problem);
-        IParallelEvaluator parallelEvaluator = new MultithreadedEvaluator(0);
-        algorithm = new pNSGAII(problem,parallelEvaluator);
+        IParallelEvaluator parallelEvaluator = new MultithreadedEvaluator(105);
+        algorithm = new SPAE2Parallel(problem,parallelEvaluator);
 
         // Algorithm parameters
-//        algorithm.setInputParameter("populationSize",100);
-//        algorithm.setInputParameter("maxEvaluations",1000000);
+        algorithm.setInputParameter("populationSize",1000);
+        algorithm.setInputParameter("maxEvaluations",1000000);
+        algorithm.setInputParameter("archiveSize", 1000);
+//        algorithm.setInputParameter("databank",knapsack.getDatabank());
 
 
 
-        algorithm.setInputParameter("populationSize",Integer.parseInt(args[0]));
-        algorithm.setInputParameter("maxEvaluations",Integer.parseInt(args[1]));
+
+//        algorithm.setInputParameter("populationSize",Integer.parseInt(args[0]));
+//        algorithm.setInputParameter("maxEvaluations",Integer.parseInt(args[1]));
 //        algorithm.setInputParameter("maxEvaluations",1000);
 //        algorithm.setInputParameter("archiveSize",100);
 
         // Mutation and Crossover for Real codification
         parameters = new HashMap() ;
-        parameters.put("probability", 1.0) ;
+        parameters.put("probability", 0.75) ; // 1.0
         parameters.put("distributionIndex", 20.0) ;
         crossover = CrossoverFactory.getCrossoverOperator("SinglePointCrossover", parameters);
 
@@ -112,7 +120,7 @@ public class Main
 
         // Selection Operator
         parameters = null ;
-        selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;
+        selection = SelectionFactory.getSelectionOperator("BinaryTournament", parameters) ;
 
         // Add the operators to the algorithm
         algorithm.addOperator("crossover",crossover);

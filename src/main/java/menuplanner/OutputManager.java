@@ -1,6 +1,7 @@
 package menuplanner;
 
 import Models.Food;
+import Models.Nutrition;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.graphics.DrawingContext;
 import de.erichseifert.gral.io.plots.DrawableWriter;
@@ -17,6 +18,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -169,9 +171,13 @@ ex.printStackTrace();
 
             for(int j=0; j<databank.size(); j++)
             {
-                bufferedWriter.write("---- Begining of "+j+" th result ----");
+                bufferedWriter.write("---- Begining of " + j + " th result ----");
                 bufferedWriter.newLine();
-                bufferedWriter.write( databank.get(j).getObjective(0) +" "+databank.get(j).getObjective(1) + " - Constrain Num = "+databank.get(j).getNumberOfViolatedConstraint()+" - Total constraint = "+databank.get(j).getOverallConstraintViolation());
+                String outputStr ="";
+                for(int i =0; i<databank.get(0).getNumberOfObjectives(); i++)
+                    outputStr += databank.get(j).getObjective(i) +" ";
+                outputStr+= " - Constrain Num = "+databank.get(j).getNumberOfViolatedConstraint()+" - Total constraint = "+databank.get(j).getOverallConstraintViolation();
+                bufferedWriter.write(outputStr);
                 bufferedWriter.newLine();
 
                 FileOutputStream fileOutputStream_local = new FileOutputStream(getFoodListFolder().getPath()+"/"+j+".txt");
@@ -191,15 +197,16 @@ ex.printStackTrace();
                 int a=0;
                 for(Variable var: databank.get(j).getDecisionVariables())
                 {
-                    a++;
+
                     if(var.toString().compareTo("1") == 0)
                     {
-                        Food tempfood = Knapsack.databank.get(a);
+                        Food tempfood = Knapsack.getDatabank().get(a);
                         foodArrayList.add(tempfood);
                         String temp = tempfood.getFoodName();
                         bw_local.write(temp);
                         bw_local.newLine();
                     }
+                    a++;
                 }
 
                 double carbonhydrate=0.0, fiber=0.0, sugar=0.0, magnesium=0.0, phosphorus =0.0, rate = 0.0, potassium=0.0,
@@ -211,33 +218,33 @@ ex.printStackTrace();
                         calcium=0.0,copper=0.0,iron=0.0;
                 for(int i=0;i<foodArrayList.size();i++)
                 {
-                    carbonhydrate += foodArrayList.get(i).getCarbonhydrt();
-                    fiber += foodArrayList.get(i).getFiber();
-                    protein += foodArrayList.get(i).getProtein();
-                    water += foodArrayList.get(i).getWater();
-                    vitaminA_IU += foodArrayList.get(i).getVitaminA_IU();
-                    thiamin += foodArrayList.get(i).getThiamin();
-                    riboflavin += foodArrayList.get(i).getRiboflavin();
-                    niacin += foodArrayList.get(i).getNiacin();
-                    copper += foodArrayList.get(i).getCopper();
-                    magnesium += foodArrayList.get(i).getMagnesium();
-                    phosphorus += foodArrayList.get(i).getPhosphorus();
-                    selenium += foodArrayList.get(i).getPhosphorus();
-                    zinc += foodArrayList.get(i).getZinc();
-                    vitaminC += foodArrayList.get(i).getVitaminC();
-                    vitaminD +=foodArrayList.get(i).getVitaminD();
-                    vitaminE += foodArrayList.get(i).getVitaminE();
-                    vitaminK += foodArrayList.get(i).getVitaminK();
-                    thiamin += foodArrayList.get(i).getThiamin();
-                    riboflavin += foodArrayList.get(i).getRiboflavin();
-                    vitaminB6 += foodArrayList.get(i).getVitaminB6();
-                    folateTot += foodArrayList.get(i).getFolateTot();
-                    vitaminB12 += foodArrayList.get(i).getVitaminB12();
-                    PantoAcid += foodArrayList.get(i).getPantoAcid();
-                    CholineTot += foodArrayList.get(i).getCholineTot();
-                    calcium += foodArrayList.get(i).getCalcium();
-                    copper += foodArrayList.get(i).getCopper();
-                    iron += foodArrayList.get(i).getIron();
+                    HashMap<Nutrition,Double> localFoodMap  = foodArrayList.get(i).getIngredient();
+                    carbonhydrate += localFoodMap.get(Nutrition.Carbohydrate);
+                    fiber += localFoodMap.get(Nutrition.Fiber);
+                    protein += localFoodMap.get(Nutrition.Protein);
+                    water += localFoodMap.get(Nutrition.Water);
+                    vitaminA_IU += localFoodMap.get(Nutrition.VitaminA_IU);
+                    thiamin += localFoodMap.get(Nutrition.Thiamine);
+                    riboflavin += localFoodMap.get(Nutrition.Thiamine);
+                    niacin += localFoodMap.get(Nutrition.Thiamine);
+                    copper += localFoodMap.get(Nutrition.Thiamine);
+                    magnesium += localFoodMap.get(Nutrition.Thiamine);
+                    phosphorus += localFoodMap.get(Nutrition.Thiamine);
+                    selenium += localFoodMap.get(Nutrition.Thiamine);
+                    zinc +=localFoodMap.get(Nutrition.Thiamine);
+                    vitaminC += localFoodMap.get(Nutrition.Thiamine);
+                    vitaminD +=localFoodMap.get(Nutrition.Thiamine);
+                    vitaminE += localFoodMap.get(Nutrition.Thiamine);
+                    vitaminK += localFoodMap.get(Nutrition.Energy.VitaminK);
+                    riboflavin += localFoodMap.get(Nutrition.Riboflavin);
+                    vitaminB6 += localFoodMap.get(Nutrition.VitaminB6);
+                    folateTot += localFoodMap.get(Nutrition.FolateTot);
+                    vitaminB12 += localFoodMap.get(Nutrition.VitaminB12);
+                    PantoAcid += localFoodMap.get(Nutrition.PantoAcid);
+                    CholineTot += localFoodMap.get(Nutrition.CholineTot);
+                    calcium += localFoodMap.get(Nutrition.Calcium);
+                    copper += localFoodMap.get(Nutrition.Copper);
+                    iron += localFoodMap.get(Nutrition.Iron);
                 }
 
                 String result = "Result carbonhydrate = "+carbonhydrate +" fiber= "+fiber+" protein= "+protein+

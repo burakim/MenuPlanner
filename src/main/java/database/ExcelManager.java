@@ -60,7 +60,7 @@ public class ExcelManager {
                         //For each row, iterate through all the columns
                         // buryaa eklersin.
                     }
-                    filterOperations.maintaindataStore();
+//                    filterOperations.maintaindataStore();
                 }
             }
             filterOperations.printFoods();

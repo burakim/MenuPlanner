@@ -1,6 +1,8 @@
 package menuplanner;
 
+import Models.ConstraintModel;
 import Models.Food;
+import Models.Nutrition;
 import database.MongoManager;
 import jmetal.core.Problem;
 
@@ -8,21 +10,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jmetal.core.Solution;
 import jmetal.core.SolutionType;
 import jmetal.core.Variable;
 
 import jmetal.encodings.solutionType.BinarySolutionType;
-import jmetal.encodings.solutionType.IntSolutionType;
 
+import jmetal.encodings.variable.Int;
 import jmetal.util.JMException;
-
-import javax.sound.midi.SysexMessage;
+import org.bson.Document;
 
 /**
 * Created by burak on 15/03/15.
@@ -43,11 +41,27 @@ public class Knapsack extends Problem
     private double[] values ;
     private double[] rate ;
     private int[]  length;
-    public static ArrayList<Food> databank;
+    static double  tolarance = 0.15;
+
+    double chanceofRepair;
+    static   double[] maxVal  =              {2500,650 ,120 ,3000 ,2000 ,100 ,1000 ,-2 ,-2    ,35  ,100   ,-2  ,10     ,45 ,350  ,4000 ,400 ,40  };
+    static  double[] recommendVal =          {800 ,100 ,43  ,625  ,75   ,10  ,12   ,1  ,101   ,12  ,1.1   ,2  ,0.7    ,6  ,330  ,580  ,45  ,9.4 };
+    static  double[] constraintCoefficient = {100 ,100 ,100 ,100 ,100   ,100 ,100  ,100,100   ,100 ,100   ,100,100    ,100,100  ,100  ,100 ,100 };
+    private static ArrayList<Food> databank;
+    private static HashMap<Nutrition, ConstraintModel> constraintDatabank;
 
 
-//    private int[] length = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+
+    //    private int[] length = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
     double storageSize=5000;
+
+    public static ArrayList<Food> getDatabank() {
+        return databank;
+    }
+
+    public static void setDatabank(ArrayList<Food> databank) {
+        Knapsack.databank = databank;
+    }
 
     public double[] readTextFile(String inputfile)
     {
@@ -74,7 +88,7 @@ public class Knapsack extends Problem
         super();
     }
 
-    public Knapsack(String SolutionType, Integer numberofVariables, Integer numberofObjectives, Integer numberofConstraints)
+    public Knapsack(String SolutionType, Integer numberofVariables, Integer numberofObjectives, Integer numberofConstraints, double chanceofRepair)
     {
 //        for (int i =0; i<length.length;i++)
 //            length[i]=1;
@@ -82,21 +96,23 @@ public class Knapsack extends Problem
 //        values = readTextFile("/Users/burak/Bitirme Odevi/menuplanner/values.txt")    ;
 //        rate = readTextFile("/Users/burak/Bitirme Odevi/menuplanner/ratings.txt")    ;
         MongoManager mongoManager =new MongoManager();
-        databank = mongoManager.getAllElements();
-                          length = new int[databank.size()];
+        setDatabank(mongoManager.getAllElements());
+        constraintDatabank  = mongoManager.getAllConstraints();
+                          length = new int[getDatabank().size()];
 
-        for(int i=0; i<databank.size();i++)
+        for(int i=0; i< getDatabank().size();i++)
         {
             length[i] = 1;
         }
         length_=length;
         //numberOfVariables_= numberofVariables;
-        numberOfVariables_ = databank.size();
+        numberOfVariables_ = getDatabank().size();
         length = new int[numberOfVariables_];
         lowerLimit_ = new double[numberOfVariables_];
         upperLimit_ = new double[numberOfVariables_];
         numberOfConstraints_ = numberofConstraints;
         numberOfObjectives_ = numberofObjectives;
+        this.chanceofRepair = chanceofRepair;
         problemName_ = "Knapsack";
 
         if(SolutionType.equals("Binary"))
@@ -127,7 +143,7 @@ public class Knapsack extends Problem
             if(variables[var].toString().compareTo("1") == 0){
                 //targetcal = targetcal + databank.get(var).getEnergy();
                 cost = cost+ databank.get(var).getCost();
-                interest = interest + databank.get(var).getRate();
+                interest = interest + getDatabank().get(var).getRate();
 
 
             }
@@ -138,81 +154,142 @@ if(cost <0)
 }
         solution.setObjective(0, cost);
         solution.setObjective(1, -1*interest);
+
     }
 
     @Override
     public void evaluateConstraints(Solution solution) throws JMException {
         Variable[] variables = solution.getDecisionVariables();
+        boolean isTime2Save;
+        Random random = new Random();
+        if(chanceofRepair * 100 <= random.nextInt(101))
+        {
+            isTime2Save = true;
+
+        }
+        else
+        {
+            isTime2Save = false;
+        }
+        int tempNum = random.nextInt(100);
         int number = 0;
         double total = 0.0;
-        double[] constraints = new double[numberOfConstraints_];
+        double[] constraints = new double[constraintDatabank.size()];
+        HashMap<Nutrition,Double> constraintsMap = new HashMap<Nutrition, Double>();
         for (int var = 0; var < this.numberOfVariables_; var++) {
             if(variables[var].toString().compareTo("1") == 0) {
 
-               constraints[0] = constraints[0] +  databank.get(var).getCalcium();
-                constraints[1] = constraints[1] + databank.get(var).getProtein();
-                constraints[2] = constraints[2] + databank.get(var).getCarbonhydrt();
-                constraints[3] = constraints[3] + databank.get(var).getVitaminA_IU();
-                constraints[4] = constraints[4] + databank.get(var).getVitaminC();
-                constraints[5] = constraints[5] + databank.get(var).getVitaminD();
-                constraints[6] = constraints[6] + databank.get(var).getVitaminE();
-                constraints[7] = constraints[7] + databank.get(var).getThiamin();
-                constraints[8] = constraints[8] + databank.get(var).getRiboflavin();
-                constraints[9] = constraints[9] + databank.get(var).getNiacin();
-                constraints[10] = constraints[10] + databank.get(var).getVitaminB6();
+
+               constraints[0] = constraints[0] +  getDatabank().get(var).getIngredient().get(Nutrition.Calcium);
+                constraints[1] = constraints[1] + getDatabank().get(var).getIngredient().get(Nutrition.Protein);
+                constraints[2] = constraints[2] + getDatabank().get(var).getIngredient().get(Nutrition.Carbohydrate);
+
+                constraints[3] = constraints[3] + getDatabank().get(var).getIngredient().get(Nutrition.Calorie);
+
+                constraints[4] = constraints[4] + getDatabank().get(var).getIngredient().get(Nutrition.VitaminC);
+
+
+                constraints[6] = constraints[6] + getDatabank().get(var).getIngredient().get(Nutrition.VitaminE);
+                constraints[7] = constraints[7] + getDatabank().get(var).getIngredient().get(Nutrition.Thiamine);
+                constraints[8] = constraints[8] + getDatabank().get(var).getIngredient().get(Nutrition.Riboflavin);
+                constraints[9] = constraints[9] + getDatabank().get(var).getIngredient().get(Nutrition.Niacin);
+                constraints[10] = constraints[10] + getDatabank().get(var).getIngredient().get(Nutrition.VitaminB6);
 //                constraints[11] = constraints[11]  + databank.get(var).getFolateTot();
-                constraints[11] = constraints[11] + databank.get(var).getVitaminB12();
-                constraints[12] = constraints[12] + databank.get(var).getCopper();
+                constraints[11] = constraints[11] + getDatabank().get(var).getIngredient().get(Nutrition.VitaminB12);
+                constraints[12] = constraints[12] + getDatabank().get(var).getIngredient().get(Nutrition.Copper);
 //                constraints[14] = constraints[14] + databank.get(var).get(); Iodine
-                constraints[13] = constraints[13] + databank.get(var).getIron();
-                constraints[14] = constraints[14] + databank.get(var).getMagnesium();
+                constraints[13] = constraints[13] + getDatabank().get(var).getIngredient().get(Nutrition.Iron);
+                constraints[14] = constraints[14] + getDatabank().get(var).getIngredient().get(Nutrition.Magnesium);
 //                constraints[17] = constraints[17] + databank.get(var).getM(); Molybdenum
-                constraints[15] = constraints[15] + databank.get(var).getPhosphorus();
-                constraints[16] = constraints [16] + databank.get(var).getSelenium();
-                constraints[17] = constraints [17] + databank.get(var).getZinc();
+                constraints[15] = constraints[15] + getDatabank().get(var).getIngredient().get(Nutrition.Phosphorus);
+                constraints[16] = constraints [16] + getDatabank().get(var).getIngredient().get(Nutrition.Selenium);
+                constraints[17] = constraints [17] + getDatabank().get(var).getIngredient().get(Nutrition.Zinc);
+
+
+                constraints[5] = constraints [5] + getDatabank().get(var).getIngredient().get(Nutrition.FolicAcid);
+
+//                constraints[5] = constraints [5] + getDatabank().get(var).getIngredient().get(Nutrition.Iodine);
+
+//                constraints[18] = constraints [18] + getDatabank().get(var).getIngredient().get(Nutrition.Molybdenum);
+
 
             }
+
         }
-             double[] maxVal  = {2500,650 ,120 ,3000 ,2000 ,100 ,1000 ,-2 ,-2    ,35  ,100   ,-2 ,10     ,45 ,350  ,4000 ,400 ,40};
-        double[] recommendVal = {800 ,100 ,43  ,625  ,75   ,10  ,12   ,1  ,101   ,12  ,1.1   ,2  ,0.7    ,6  ,330  ,580  ,45  ,9.4};
-        double[] constraintViolation = new double[18];
-        double tolarance = 0.15;
-        for(int j=0;j<maxVal.length;j++)
+        constraintsMap.put(Nutrition.Calcium,constraints[0]);
+        constraintsMap.put(Nutrition.Protein,constraints[1]);
+        constraintsMap.put(Nutrition.Carbohydrate,constraints[2]);
+        constraintsMap.put(Nutrition.Calorie,constraints[3]);
+        constraintsMap.put(Nutrition.VitaminC,constraints[4]);
+        constraintsMap.put(Nutrition.Iodine,constraints[5]);
+        constraintsMap.put(Nutrition.VitaminE,constraints[6]);
+        constraintsMap.put(Nutrition.Thiamine,constraints[7]);
+        constraintsMap.put(Nutrition.Riboflavin,constraints[8]);
+        constraintsMap.put(Nutrition.Niacin,constraints[9]);
+        constraintsMap.put(Nutrition.VitaminB6,constraints[10]);
+        constraintsMap.put(Nutrition.VitaminB12,constraints[11]);
+        constraintsMap.put(Nutrition.Copper,constraints[12]);
+        constraintsMap.put(Nutrition.Iron,constraints[13]);
+        constraintsMap.put(Nutrition.Magnesium,constraints[14]);
+        constraintsMap.put(Nutrition.Phosphorus,constraints[15]);
+        constraintsMap.put(Nutrition.Selenium,constraints[16]);
+        constraintsMap.put(Nutrition.Zinc,constraints[17]);
+//        constraintsMap.put(Nutrition.Molybdenum,constraints[18]);
+        constraintsMap.put(Nutrition.FolicAcid,constraints[5]);
+
+
+        double[] constraintViolation = new double[constraints.length];
+        double tolarableratio = 0.1;
+        Object[] keys =  constraintDatabank.keySet().toArray();
+        for(int i =0 ; i<keys.length;i++)
         {
-if(maxVal[j] ==-2)
-{
-    if(constraints[j] < (recommendVal[j] - tolarance * recommendVal[j]))
-    {
-        constraintViolation[j] = constraints[j] - recommendVal[j];
-    }
-}
-else{
-            if (constraints[j] >= (recommendVal[j] - tolarance * recommendVal[j]) && (constraints[j] <= maxVal[j] + tolarance * recommendVal[j])) {
-                constraintViolation[j] = 0;
+            double upperLimit = constraintDatabank.get((Nutrition)keys[i]).getUpperLimit();
+            double lowerLimit = constraintDatabank.get((Nutrition)keys[i]).getLowerLimit();
 
-            } else if (constraints[j] > recommendVal[j]) {
-                constraintViolation[j] = recommendVal[j] - constraints[j];
-            } else {
-                constraintViolation[j] = constraints[j] - recommendVal[j];
+            if((constraintsMap.get(keys[i]) >= lowerLimit) && (constraintsMap.get(keys[i])<= upperLimit))
+            {
+
+                constraintViolation[i] = 0;
+
+            }
+            else if(constraintsMap.get(keys[i]) <= lowerLimit)
+            {
+                constraintViolation[i] = constraintsMap.get(keys[i]) - lowerLimit;
+            }
+            else
+            {
+                constraintViolation[i] = upperLimit - constraintsMap.get(keys[i]) ;
+                if(solution== null)
+                    System.out.print("");
+                else if (keys[i] == null)
+                    System.out.print("");
+                else if(constraintViolation == null)
+                    System.out.print("");
+                if(solution.getConstaintViolationMap() == null)
+                    System.out.print("");
+
 
             }
         }
-        }
 
-        for (int i = 0; i < maxVal.length; i++) {
+
+
+
+        for (int i = 0; i < keys.length; i++) {
 
             if (constraintViolation[i] < 0.0) {
-                double ratio;
-                if(maxVal[i]!=-2)
-                ratio = constraintViolation[i] / ((recommendVal[i]+maxVal[i])/2);
-                else
-                ratio = constraintViolation[i] / ((recommendVal[i]));
-                BigDecimal bd = new BigDecimal(ratio);
-                bd = bd.setScale(0, RoundingMode.HALF_UP);
-                number = number + (-1*bd.intValue())+1;
+                Double[] constraintArray = new Double[2];
+                 double ratio = constraintViolation[i] / (constraintDatabank.get(keys[i]).getUpperLimit() - constraintDatabank.get(keys[i]).getLowerLimit() );
+if(ratio<0)
+    ratio = ratio * -1;
+                number += (int) ratio *constraintDatabank.get(keys[i]).getSignificance();
+
 ;                // This is exceeding constraint problem.
-                number = number ;
                 total +=constraintViolation[i];
+                constraintArray[0] = (int) ratio *constraintDatabank.get(keys[i]).getSignificance();
+                constraintArray[1] = constraintViolation[i];
+                solution.getConstaintViolationMap().put((Nutrition)keys[i],constraintArray);
+
             }
 
 

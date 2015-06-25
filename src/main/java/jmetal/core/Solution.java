@@ -23,9 +23,13 @@
 
 package jmetal.core;
 
+import Models.Nutrition;
 import jmetal.encodings.variable.Binary;
+import jmetal.encodings.variable.Int;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class representing a solution for a problem.
@@ -35,7 +39,11 @@ public class Solution implements Serializable {
 	 * Stores the problem 
 	 */
   private Problem problem_ ;
-	
+	/*
+	 * Stores violation of constraints with index of variable array as a key and value is a amount of constraint violation.
+	 * Author: Burak Yesilyurt
+	 */
+  private Map<Nutrition,Double[]> constraintViolationMap;
   /**
    * Stores the type of the encodings.variable
    */	
@@ -117,6 +125,7 @@ public class Solution implements Serializable {
     type_                         = null ;
     variable_                     = null ;
     objective_                    = null ;
+    constraintViolationMap        = new HashMap<Nutrition, Double[]>();
   } // Solution
 
   /**
@@ -129,6 +138,8 @@ public class Solution implements Serializable {
   public Solution(int numberOfObjectives) {
     numberOfObjectives_ = numberOfObjectives;
     objective_          = new double[numberOfObjectives];
+    constraintViolationMap        = new HashMap<Nutrition, Double[]>();
+
   }
   
   /** 
@@ -150,7 +161,9 @@ public class Solution implements Serializable {
     //<-
 
     //variable_ = problem.solutionType_.createVariables() ; 
-    variable_ = type_.createVariables() ; 
+    variable_ = type_.createVariables() ;
+    constraintViolationMap        = new HashMap<Nutrition, Double[]>();
+
   } // Solution
   
   static public Solution getNewSolution(Problem problem) throws ClassNotFoundException {
@@ -175,6 +188,8 @@ public class Solution implements Serializable {
     //<-
 
     variable_ = variables ;
+    constraintViolationMap        = new HashMap<Nutrition, Double[]>();
+
   } // Constructor
   
   /** 
@@ -202,6 +217,8 @@ public class Solution implements Serializable {
     marked_               = solution.isMarked();
     rank_                 = solution.getRank();
     location_             = solution.getLocation();
+    constraintViolationMap        = new HashMap<Nutrition, Double[]>();
+
   } // Solution
 
   /**
@@ -509,4 +526,9 @@ public class Solution implements Serializable {
 
     return bits ;
   } // getNumberOfBits
+  public Map<Nutrition,Double[]> getConstaintViolationMap()
+  {
+    return this.constraintViolationMap;
+  }
+
 } // Solution
